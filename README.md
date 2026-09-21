@@ -1,5 +1,9 @@
 # local-decision-model
 
+[![tests](https://github.com/Pdbz199/local-decision-model/actions/workflows/tests.yml/badge.svg)](https://github.com/Pdbz199/local-decision-model/actions/workflows/tests.yml)
+[![model on HuggingFace](https://img.shields.io/badge/model-HuggingFace-yellow)](https://huggingface.co/Pdbz199/local-decision-model)
+[![code license: MIT](https://img.shields.io/badge/code-MIT-blue)](LICENSE)
+
 A small, fast, local decision model: **unstructured state in, typed probabilistic decisions out.**
 
 ![Three support tickets are typed in; eight typed decisions with confidence bars appear for each in about 16 ms](assets/hero.gif)
@@ -49,7 +53,8 @@ cd experiments && DECISION_MODEL_PATH=Pdbz199/local-decision-model uv run python
 Or, inside your own project: `pip install git+https://github.com/Pdbz199/local-decision-model`, then the snippet above.
 `DecisionModel.load()` accepts a Hub id or a local checkpoint directory. With no argument it uses the
 `DECISION_MODEL_PATH` environment variable, then `checkpoints/decision-model` (where `scripts/reproduce.sh` puts a model
-you train yourself). An NVIDIA GPU is recommended; it also runs on CPU, more slowly. The weights are released under
+you train yourself). An NVIDIA GPU is recommended. It also runs on CPU: in a clean CPU-only install on a 20-thread
+desktop processor, one yes/no question takes about 48 ms and a 5-field schema about 178 ms. The weights are released under
 CC BY-NC 4.0 because of the training data (see [License](#license)); the code is MIT.
 
 ## Why we built this

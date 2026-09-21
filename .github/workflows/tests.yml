@@ -1,0 +1,34 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      # The unit tests need no GPU and no trained checkpoint, so install the much smaller CPU build of PyTorch
+      # first. The project's own requirement (torch>=2.14) is then already satisfied.
+      - name: Install
+        run: |
+          uv venv --python 3.12
+          uv pip install torch --index-url https://download.pytorch.org/whl/cpu
+          uv pip install -e . pytest
+
+      - name: Unit tests
+        run: .venv/bin/python -m pytest -q
+
+      - name: No em or en dashes (project writing rule)
+        run: |
+          if grep -rnP "\x{2014}|\x{2013}" --exclude-dir=.venv --exclude-dir=.git --include="*.py" --include="*.md" --include="*.toml" --include="*.yml" --include="*.sh" . ; then
+            echo "found an em or en dash"; exit 1
+          fi
