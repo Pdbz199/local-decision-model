@@ -13,6 +13,7 @@ from pathlib import Path
 
 import torch
 import torch.nn as nn
+from safetensors.torch import load_file, save_file
 from transformers import AutoConfig, AutoModel, AutoTokenizer
 
 from .encoding import MODES
@@ -63,7 +64,7 @@ class DecisionNet(nn.Module):
         self.encoder.save_pretrained(path / "encoder")
         tokenizer.save_pretrained(path / "encoder")
         heads = {k: v for k, v in self.state_dict().items() if not k.startswith("encoder.")}
-        torch.save(heads, path / "heads.pt")
+        save_file({k: v.contiguous() for k, v in heads.items()}, str(path / "heads.safetensors"))  # no pickle: safe to share
         (path / "meta.json").write_text(json.dumps(meta or {}, indent=2))
 
     @classmethod
@@ -72,7 +73,11 @@ class DecisionNet(nn.Module):
         cfg = AutoConfig.from_pretrained(path / "encoder")
         enc = AutoModel.from_pretrained(path / "encoder", attn_implementation="sdpa", dtype=dtype)
         model = cls(enc, cfg.hidden_size)
-        model.load_state_dict(torch.load(path / "heads.pt", map_location="cpu"), strict=False)
+        if (path / "heads.safetensors").exists():
+            heads = load_file(str(path / "heads.safetensors"))
+        else:  # checkpoints written before the switch to safetensors
+            heads = torch.load(path / "heads.pt", map_location="cpu", weights_only=True)
+        model.load_state_dict(heads, strict=False)
         model.opt_head.to(dtype)
         model.span_head.to(dtype)
         tok = AutoTokenizer.from_pretrained(path / "encoder")

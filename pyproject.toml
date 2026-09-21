@@ -3,13 +3,17 @@ name = "decisionmodel"
 version = "0.1.0"
 description = "A local decision model: unstructured state in, typed probabilistic decisions out."
 readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [
     { name = "Preston Rozwood", email = "279pdbz199@gmail.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
     "datasets>=5.0.1",
+    "huggingface-hub>=1.32.0",
     "numpy>=2.5.3",
+    "safetensors>=0.8.0",
     "scikit-learn>=1.9.1",
     "torch>=2.14.0",
     "transformers>=5.17.0",

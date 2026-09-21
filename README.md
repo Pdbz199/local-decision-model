@@ -296,6 +296,7 @@ scripts/evaluate.py        zero-shot evaluation on held-out datasets
 scripts/eval_multilabel.py held-out multi-label evaluation
 scripts/collect_visual_data.py, make_visuals.py   real model outputs -> assets/data.json -> images and GIFs
 scripts/reproduce.sh       rebuilds everything end to end
+scripts/publish_to_hub.py  uploads the checkpoint and a model card to the HuggingFace Hub
 REPRODUCING.md             step by step reproduction guide and troubleshooting
 results/                   saved evaluation numbers and experiment outputs
 assets/                    images and GIFs used in this README
@@ -340,3 +341,12 @@ tests/                     unit tests for types, encoding and decoding
   we looked at held-out errors between training rounds to decide which *kinds* of public data to add
   (more task variety, more injection styles, numeric scales). That is weaker than a fully blind evaluation.
 * Everything we know about Jev comes from one blog post. Any resemblance of internals is a guess.
+
+## License
+
+The code in this repository is released under the [MIT License](LICENSE).
+
+Two things are not covered by that license. The base model, ModernBERT-base, is Apache 2.0. The training data comes from
+public datasets that each carry their own license, and some restrict commercial use (for example lmsys/toxic-chat under
+CC BY-NC 4.0, and the Yelp reviews dataset). If you train and distribute weights, check the sources listed in
+`scripts/build_data.py` against your intended use, and remove the ones that do not fit.

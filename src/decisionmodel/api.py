@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -40,12 +41,23 @@ class DecisionModel:
 
     @classmethod
     def load(cls, path: str | Path | None = None, device: str | None = None, warmup: bool = True, **kw) -> "DecisionModel":
-        """Loads a trained checkpoint. `path` defaults to $DECISION_MODEL_PATH, then to checkpoints/decision-model."""
-        path = Path(path or os.environ.get("DECISION_MODEL_PATH", "checkpoints/decision-model"))
+        """Loads a trained checkpoint.
+
+        `path` is a local directory or a HuggingFace Hub id such as "user/local-decision-model".
+        It defaults to $DECISION_MODEL_PATH, then to checkpoints/decision-model.
+        """
+        spec = str(path or os.environ.get("DECISION_MODEL_PATH", "checkpoints/decision-model"))
+        path = Path(spec)
         if not path.exists() and not path.is_absolute():  # allow running from any directory inside the repo
-            path = Path(__file__).resolve().parents[2] / path
+            in_repo = Path(__file__).resolve().parents[2] / path
+            if in_repo.exists():
+                path = in_repo
+            elif re.fullmatch(r"[\w.-]+/[\w.-]+", spec):  # looks like a Hub id: download (cached after the first time)
+                from huggingface_hub import snapshot_download
+                path = Path(snapshot_download(spec, allow_patterns=["meta.json", "heads.safetensors", "encoder/*"]))
         if not (path / "meta.json").exists():
-            raise FileNotFoundError(f"no trained model at {path}; run scripts/build_data.py and scripts/train.py first")
+            raise FileNotFoundError(f"no trained model at {spec}: pass a checkpoint directory or a HuggingFace Hub id, "
+                                    "or train one with scripts/reproduce.sh")
         device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         dtype = torch.bfloat16 if device.startswith("cuda") else torch.float32
         model, tok, meta = DecisionNet.load(path, device=device, dtype=dtype)
