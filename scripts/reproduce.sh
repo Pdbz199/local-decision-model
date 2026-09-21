@@ -28,5 +28,6 @@ for f in experiments/0*.py; do
 done
 echo "== 7/7 visuals"
 uv run python scripts/collect_visual_data.py
+(cd experiments && uv run python 06_snake.py --record) > /dev/null   # writes assets/snake.json for the Snake GIF
 uv run python scripts/make_visuals.py
 echo "done: model in checkpoints/decision-model, numbers in results/, images in assets/"

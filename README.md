@@ -239,10 +239,10 @@ How to read this honestly:
 * On unfamiliar threshold-style tasks the model can be overconfident (prompt injections: mean confidence 0.97 at 70%
   accuracy, with precision 0.98 but recall 0.24). Pick thresholds on a few of your own examples.
 
-### The five experiments
+### The six experiments
 
 Each script in `experiments/` is a runnable usage example that ends with explicit pass/fail checks.
-All five pass on the shipped checkpoint; their full output is in `results/experiments/`.
+All six pass on the shipped checkpoint; their full output is in `results/experiments/`.
 
 | # | Scenario from the Jev post | What it shows |
 | --- | --- | --- |
@@ -251,6 +251,45 @@ All five pass on the shipped checkpoint; their full output is in `results/experi
 | 3 | Map-reduce over large datasets | 15,200 decisions in 10 s, then a reduce step that sums probabilities into expected counts. |
 | 4 | Guardrails and verification of LLM output | Zero-shot injection detection, a grounding check that catches 8 of 8 planted errors, and an attack on the guard itself. |
 | 5 | Calibration and type safety | Reliability table on held-out tasks (ECE 0.069), 209 garbage and hostile inputs with 0 type violations, latency up to 8K tokens. |
+| 6 | Not from the post: real-time control | The model plays Snake by reading one English sentence per candidate move. 32 food per game against 1.3 for random safe moves, 12 ms per move. |
+
+### It can play Snake
+
+![A recorded game of Snake: the board on the left, and on the right the four sentences the model reads with its probability for each move](assets/snake.gif)
+
+<sub>Animation not playing? See a [still frame](assets/snake.png).</sub>
+
+The model has never seen Snake, and it reads text, not grids. So `experiments/06_snake.py` has the game write a short
+English report for each of the four moves ("If the snake moves left, it bites its own body and dies."), and asks the
+model two typed questions about every report: `Bool("Is this move safe and does it bring the snake closer to the food?")`
+and `Bool("Does the snake die if it makes this move?")`. All eight rows go through one forward pass, and the snake moves
+wherever the first probability is highest. The GIF is a real recorded game (the last 230 of 529 moves), and every bar
+in it is a model output.
+
+| Policy, 6 seeded games on a 12 x 10 board | Mean food eaten | Per game |
+| --- | --- | --- |
+| Random safe moves | 1.3 | 2, 0, 1, 0, 4, 1 |
+| **Decision model reading the reports** | **32.2** | 26, 29, 28, 44, 33, 33 |
+| Hand-coded rule over the same facts | 36.7 | 39, 27, 50, 37, 41, 26 |
+
+What this does and does not show:
+
+* The division of labor is the usual one for this model. Plain code does the geometry (collision test, a flood fill
+  that detects dead-end pockets) and writes it down as text; the model does the judgment. A dozen lines of if-statements
+  over the same facts play slightly better, so this is a demonstration of the interface, not a claim that you need a
+  model to play Snake.
+* What the model contributes is reading unstructured text zero-shot and returning probabilities that are good enough to
+  act on 2,204 times in a row: it picked a fatal move when a safe one existed once, and P(dies) was on the right side
+  of 0.5 for all 8,816 reports. A decision takes 12 ms (p95 20 ms), so the game could run at 80 moves per second.
+* Wording matters here too. The question `"Is this a good move for the snake?"` scores near zero with the same reports,
+  because the model calls every survivable move good and the snake wanders. See [Limitations](#limitations-honestly).
+* All games end the same way: the snake boxes itself in, because a one-move lookahead cannot plan an escape route.
+
+Watch a live game in your terminal with `cd experiments && uv run python 06_snake.py --watch`.
+
+The idea for this demo came from the Snake demo in [laya-mlx](https://github.com/mizorewww/laya-mlx) by mizorewww,
+where a small local model plays Snake on Apple silicon. Ours is an independent implementation with a different approach
+(a text-reading classifier instead of a trained policy) and shares no code or assets with it.
 
 ### How this compares with Jev
 
@@ -288,7 +327,8 @@ uv run python scripts/train.py --calibrate-only --out checkpoints/decision-model
 
 uv run python scripts/evaluate.py               # zero-shot evaluation on held-out datasets
 uv run python scripts/eval_multilabel.py        # held-out multi-label check
-uv run python scripts/collect_visual_data.py && uv run python scripts/make_visuals.py   # images and GIFs in assets/
+uv run python scripts/collect_visual_data.py && (cd experiments && uv run python 06_snake.py --record)   # real outputs for the visuals
+uv run python scripts/make_visuals.py           # images and GIFs in assets/
 uv run pytest                                   # fast unit tests, no GPU needed
 cd experiments && for f in 0*.py; do uv run python $f; done
 ```
@@ -316,13 +356,13 @@ scripts/make_stage2.py     builds the small stage 2 refresh set
 scripts/average_checkpoints.py  averages checkpoints from the same lineage
 scripts/evaluate.py        zero-shot evaluation on held-out datasets
 scripts/eval_multilabel.py held-out multi-label evaluation
-scripts/collect_visual_data.py, make_visuals.py   real model outputs -> assets/data.json -> images and GIFs
+scripts/collect_visual_data.py, make_visuals.py   real model outputs -> assets/data.json, assets/snake.json -> images and GIFs
 scripts/reproduce.sh       rebuilds everything end to end
 scripts/publish_to_hub.py  uploads the checkpoint and a model card to the HuggingFace Hub
 REPRODUCING.md             step by step reproduction guide and troubleshooting
 results/                   saved evaluation numbers and experiment outputs
 assets/                    images and GIFs used in this README
-experiments/               five runnable demonstrations with pass/fail checks
+experiments/               six runnable demonstrations with pass/fail checks
 tests/                     unit tests for types, encoding and decoding
 ```
 

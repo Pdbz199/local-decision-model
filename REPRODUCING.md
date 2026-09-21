@@ -32,8 +32,8 @@ its Triton GPU kernels. Many system Pythons do not, and fail with `Python.h: No 
 | 4c | `uv run python scripts/average_checkpoints.py --out checkpoints/decision-model checkpoints/decision-model-stage1 checkpoints/decision-model-stage2` | 1 min | the averaged model |
 | 4d | `uv run python scripts/train.py --calibrate-only --out checkpoints/decision-model` | 2 min | calibration temperatures, written into `checkpoints/decision-model/meta.json` |
 | 5 | `uv run pytest`, `uv run python scripts/evaluate.py`, `uv run python scripts/eval_multilabel.py` | 5 min | `results/eval.json` and the multi-label numbers |
-| 6 | `cd experiments && for f in 0*.py; do uv run python $f; done` | 5 min | five experiments, each ending in pass/fail checks |
-| 7 | `uv run python scripts/collect_visual_data.py && uv run python scripts/make_visuals.py` | 3 min | `assets/data.json`, then every image and GIF in `assets/` |
+| 6 | `cd experiments && for f in 0*.py; do uv run python $f; done` | 6 min | six experiments, each ending in pass/fail checks |
+| 7 | `uv run python scripts/collect_visual_data.py && (cd experiments && uv run python 06_snake.py --record) && uv run python scripts/make_visuals.py` | 5 min | `assets/data.json` and `assets/snake.json`, then every image and GIF in `assets/` |
 
 Stage 1 alone already gives a usable model: pass `--out checkpoints/decision-model` in step 3 and skip step 4.
 

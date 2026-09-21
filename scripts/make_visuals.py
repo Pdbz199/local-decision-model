@@ -1,4 +1,5 @@
-"""Renders every image and GIF in assets/ from assets/data.json (real model outputs, see collect_visual_data.py).
+"""Renders every image and GIF in assets/ from assets/data.json (real model outputs, see collect_visual_data.py)
+and assets/snake.json (a real recorded game, see experiments/06_snake.py --record).
 
 Usage: uv run python scripts/make_visuals.py
 """
@@ -209,6 +210,74 @@ def make_routing():
     frames[len(frames) // 2 + 50].save(ASSETS / "routing_escalate.png")
 
 
+# ----------------------------------------------------------------------------- snake: reading sensor reports
+
+def snake_frame(game, k, over=0.0):
+    f, cols, rows = game["frames"][k], game["cols"], game["rows"]
+    c = Canvas()
+    header(c, "ZERO-SHOT CONTROL", "It has never seen Snake. It reads four sentences and picks a move.")
+    # left card: the board
+    c.rect(32, 92, 452, 462, CARD, r=10)
+    c.text(48, 106, "BOARD", font(11, bold=True), MUTED)
+    c.text(436, 106, f"recorded game, step {k + 1} of {len(game['frames'])}", font(11), MUTED, anchor="ra")
+    cell, bx, by = 32, 50, 130
+    c.rect(bx - 4, by - 4, bx + cols * cell + 4, by + rows * cell + 4, SURFACE, r=8)
+    for x in range(cols):
+        for y in range(rows):
+            c.rect(bx + x * cell + 1.5, by + y * cell + 1.5, bx + (x + 1) * cell - 1.5, by + (y + 1) * cell - 1.5, blend(SURFACE, CARD, 0.55), r=4)
+    n, inset = len(f["body"]), 4
+    for i in range(n - 1, -1, -1):  # tail first, each segment joined to the one before it so the path stays readable
+        (x, y), (px, py) = f["body"][i], f["body"][max(i - 1, 0)]
+        col = blend(AQUA, SURFACE, 0.6 * i / n)
+        c.rect(bx + min(x, px) * cell + inset, by + min(y, py) * cell + inset,
+               bx + (max(x, px) + 1) * cell - inset, by + (max(y, py) + 1) * cell - inset, col, r=5)
+    hx, hy = f["body"][0]
+    c.rect(bx + hx * cell + inset, by + hy * cell + inset, bx + (hx + 1) * cell - inset, by + (hy + 1) * cell - inset, blend(TEXT, AQUA, 0.35), r=5)
+    fx, fy = f["food"]
+    c.rect(bx + fx * cell + 8, by + fy * cell + 8, bx + (fx + 1) * cell - 8, by + (fy + 1) * cell - 8, ORANGE, r=8)
+    # right card: the four reports the model reads, and its answer to each
+    c.rect(464, 92, 928, 462, CARD, r=10)
+    c.text(480, 106, "WHAT THE MODEL READS", font(11, bold=True), MUTED)
+    c.text(912, 106, "bar = P(yes) to the question below", font(11), MUTED, anchor="ra")
+    for i, (move, m) in enumerate(f["moves"].items()):
+        y, chosen = 130 + i * 82, move == f["move"]
+        if chosen:
+            c.rect(472, y - 6, 920, y + 68, blend(CARD, BLUE, 0.16), r=8)
+        c.text(484, y, ("> " if chosen else "  ") + move, font(13, bold=True, mono=True), TEXT if chosen else TEXT2)
+        c.text(484, y + 22, f"  dies {m['p_dies']:.2f}", font(10, mono=True), ORANGE if m["p_dies"] > 0.5 else MUTED)
+        for j, line in enumerate(textwrap.wrap(m["report"], 62)):
+            c.text(570, y + j * 15, line, font(11), TEXT if chosen else TEXT2)
+        c.rect(570, y + 52, 860, y + 57, TRACK, r=2)
+        c.rect(570, y + 52, 570 + 290 * max(m["p_good"], 0.01), y + 57, BLUE if chosen else blend(CARD, BLUE, 0.5), r=2)
+        c.text(912, y + 47, f"{m['p_good']:.2f}", font(12, bold=True), TEXT if chosen else TEXT2, anchor="ra")
+    # footer: score, honest framing, credit
+    big = font(30, bold=True)
+    c.text(32, 474, f"{f['score']:02d}", big, TEXT)
+    c.text(32, 511, "food eaten", font(11), MUTED)
+    x = 32 + max(c.width("00", big), c.width("food eaten", font(11))) + 20
+    c.text(x, 478, f"length {n}   |   {game['ms_p50']:.0f} ms per move   |   asked of each report: \"{game['schema']['good']}\"", font(13), TEXT2)
+    c.text(x, 497, "No Snake training. Plain code does the geometry and writes the reports; the model reads them and ranks the moves.", font(13), MUTED)
+    c.text(x, 516, "Demo idea inspired by laya-mlx: github.com/mizorewww/laya-mlx", font(11), MUTED)
+    if over > 0:
+        a = ease(over)
+        c.rect(120, 262, 364, 322, blend(CARD, SURFACE, a), r=10)
+        c.text(242, 280, f"Game over after {game['final_score']} food", font(15, bold=True), blend(CARD, TEXT, a), anchor="ma")
+        boxed = all("dies." in m["report"] for m in f["moves"].values())
+        c.text(242, 302, "every remaining move was fatal" if boxed else "the model picked a fatal move", font(11), blend(CARD, TEXT2, a), anchor="ma")
+    return c.done()
+
+
+def make_snake(tail=230):
+    game = json.loads((ASSETS / "snake.json").read_text())
+    ms = sorted(f["ms"] for f in game["frames"])
+    game["ms_p50"] = ms[len(ms) // 2]
+    last = len(game["frames"]) - 1
+    frames = [snake_frame(game, k) for k in range(max(0, last + 1 - tail), last + 1)]  # the end of the game, where it gets hard
+    frames += [snake_frame(game, last, k / 8) for k in range(1, 9)] + [snake_frame(game, last, 1)] * 30
+    save_gif(frames, ASSETS / "snake.gif", 12)
+    frames[len(frames) // 2].save(ASSETS / "snake.png")
+
+
 # ----------------------------------------------------------------------------- static charts
 
 def style_axes(ax):
@@ -374,3 +443,4 @@ if __name__ == "__main__":
     make_architecture()
     make_hero()
     make_routing()
+    make_snake()

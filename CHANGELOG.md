@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+* Experiment 6: the model plays Snake zero-shot by reading one English sentence per candidate move
+  (`experiments/06_snake.py`, with `--watch` for a live terminal game and `--record` for the README GIF).
+  Demo idea inspired by [laya-mlx](https://github.com/mizorewww/laya-mlx).
+
 ## v0.1.0 (2026-09-21)
 
 First public release.
