@@ -15,7 +15,7 @@ and answers a whole schema of typed questions about a piece of text in roughly 1
 ```python
 from decisionmodel import DecisionModel, Bool, Enum, MultiLabel, Int, Extract
 
-dm = DecisionModel.load()  # loads checkpoints/decision-model
+dm = DecisionModel.load("Pdbz199/local-decision-model")  # downloads the trained weights from HuggingFace (577 MB, cached)
 
 ticket = "My order #48213 arrived with a cracked screen. Refund me today or I dispute the charge. dana.kim@example.org"
 
@@ -34,6 +34,23 @@ if d.urgent.p() > 0.7 and d.team.value == "billing and refunds":   # a "smart if
 Every field comes back as a `Decision` with a typed `value`, a `confidence`, and the full probability
 distribution in `probs`. A `Bool` is always a Python `bool`. An `Enum` is always one of the strings you declared.
 An `Extract` is always a verbatim substring of the input, or `None`.
+
+## Getting the model
+
+The trained weights are on the HuggingFace Hub: [Pdbz199/local-decision-model](https://huggingface.co/Pdbz199/local-decision-model).
+You do not need to train anything to try it.
+
+```bash
+git clone https://github.com/Pdbz199/local-decision-model && cd local-decision-model
+uv sync
+cd experiments && DECISION_MODEL_PATH=Pdbz199/local-decision-model uv run python 01_smart_if_ticket_triage.py
+```
+
+Or, inside your own project: `pip install git+https://github.com/Pdbz199/local-decision-model`, then the snippet above.
+`DecisionModel.load()` accepts a Hub id or a local checkpoint directory. With no argument it uses the
+`DECISION_MODEL_PATH` environment variable, then `checkpoints/decision-model` (where `scripts/reproduce.sh` puts a model
+you train yourself). An NVIDIA GPU is recommended; it also runs on CPU, more slowly. The weights are released under
+CC BY-NC 4.0 because of the training data (see [License](#license)); the code is MIT.
 
 ## Why we built this
 
@@ -348,5 +365,6 @@ The code in this repository is released under the [MIT License](LICENSE).
 
 Two things are not covered by that license. The base model, ModernBERT-base, is Apache 2.0. The training data comes from
 public datasets that each carry their own license, and some restrict commercial use (for example lmsys/toxic-chat under
-CC BY-NC 4.0, and the Yelp reviews dataset). If you train and distribute weights, check the sources listed in
+CC BY-NC 4.0, and the Yelp reviews dataset). For that reason the weights we publish on HuggingFace are released under
+CC BY-NC 4.0, not MIT. If you train and distribute your own weights, check the sources listed in
 `scripts/build_data.py` against your intended use, and remove the ones that do not fit.

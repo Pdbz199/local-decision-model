@@ -6,7 +6,8 @@ Everything here (training data, model, evaluation numbers, experiment outputs, i
 bash scripts/reproduce.sh
 ```
 
-It takes about two hours on an RTX 5070 Ti. The sections below explain each step so you can run them one at a time.
+It takes about two hours on an RTX 5070 Ti. If you only want to use the model, skip all of this: the trained weights are
+published at https://huggingface.co/Pdbz199/local-decision-model and `DecisionModel.load("Pdbz199/local-decision-model")` fetches them. The sections below explain each step so you can run them one at a time.
 
 ## Requirements
 
