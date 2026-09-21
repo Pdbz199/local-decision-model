@@ -1,0 +1,69 @@
+
+==============================================================================
+Experiment 1: smart if-statements for ticket triage
+==============================================================================
+
+TICKET: Hi, my order #48213 arrived with a cracked screen. I want a refund of $259.99 today or I will disput...
+  urgent      True   P(yes)=0.76
+  team        billing and refunds  (confidence 0.82)
+  tags        ['refund request', 'login problem']
+  anger       5  (expected 3.74)
+  negativity  0.64
+  damaged     True   P(yes)=0.98
+  order_id    '#48213'  (confidence 1.00)
+  email       'dana.kim@example.org'  (confidence 1.00)
+  ACTION   -> PAGE on-call lead for 'billing and refunds'
+
+TICKET: Hey team, just wanted to say the new dashboard is fantastic. Setup took two minutes. Thanks! Marcus...
+  urgent      False  P(yes)=0.07
+  team        customer success  (confidence 0.69)
+  tags        ['positive feedback']
+  anger       1  (expected 1.48)
+  negativity  0.11
+  damaged     False  P(yes)=0.03
+  order_id    None  (confidence 1.00)
+  email       None  (confidence 1.00)
+  ACTION   -> auto-reply with thanks, forward to product team
+
+TICKET: I've been locked out of my account since this morning and the password reset email never arrives. I ...
+  urgent      True   P(yes)=0.85
+  team        technical support  (confidence 0.82)
+  tags        ['login problem']
+  anger       5  (expected 4.64)
+  negativity  0.87
+  damaged     True   P(yes)=0.51
+  order_id    None  (confidence 1.00)
+  email       None  (confidence 1.00)
+  ACTION   -> PAGE on-call lead for 'technical support'
+
+TICKET: Do you offer a discount for nonprofits? We are a team of 40 and are comparing plans for next year....
+  urgent      False  P(yes)=0.33
+  team        sales  (confidence 0.58)
+  tags        ['pricing question']
+  anger       2  (expected 2.12)
+  negativity  0.23
+  damaged     False  P(yes)=0.03
+  order_id    None  (confidence 1.00)
+  email       None  (confidence 1.00)
+  ACTION   -> queue for 'sales'
+
+Checks:
+  [PASS] ticket 1 routed to billing and refunds
+  [PASS] ticket 1 order id extracted verbatim ('#48213')
+  [PASS] ticket 1 email extracted verbatim ('dana.kim@example.org')
+  [PASS] ticket 2 has no order id (returns None, not a guess)
+  [PASS] ticket 2 tagged as positive feedback
+  [PASS] only ticket 1 clears the 0.6 action threshold for a damaged product (0.98, 0.03, 0.51, 0.03)
+  [PASS] ticket 1 tagged as a refund request
+  [PASS] ticket 2 is the least negative
+  [PASS] ticket 2 calmer than ticket 1 (1.48 < 3.74)
+  [PASS] ticket 3 is urgent and technical
+  [PASS] ticket 4 routed to sales
+  [PASS] extracted values are substrings of the input
+
+  latency for all 8 fields at once: p50 14.5 ms, p95 25.0 ms, max 30.9 ms
+  [PASS] 8-field decision p95 under 70 ms (fast end of Jev's 70 to 500 ms range)
+  latency for a single smart if:    p50 8.5 ms, p95 17.8 ms, max 25.6 ms
+  [PASS] single predicate p95 under 35 ms
+
+All checks passed.

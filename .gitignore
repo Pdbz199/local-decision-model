@@ -1,0 +1,22 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.pytest_cache/
+
+# Virtual environments
+.venv
+
+# Project data and artifacts (rebuild with scripts/reproduce.sh, see REPRODUCING.md)
+data/
+checkpoints/
+logs/
+nohup.out
+
+# Model weights, wherever they end up
+*.safetensors
+*.pt
+*.bin

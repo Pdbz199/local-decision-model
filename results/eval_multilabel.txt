@@ -1,0 +1,6 @@
+  ag_news pairs
+    native multi-label head            AUROC 0.860  AP 0.811  F1@0.5 0.603  predicted positive rate 0.20 (true 0.38)
+    one yes/no question per option     AUROC 0.818  AP 0.743  F1@0.5 0.656  predicted positive rate 0.43 (true 0.38)
+  banking77 pairs
+    native multi-label head            AUROC 0.944  AP 0.849  F1@0.5 0.772  predicted positive rate 0.13 (true 0.17)
+    one yes/no question per option     AUROC 0.902  AP 0.755  F1@0.5 0.685  predicted positive rate 0.16 (true 0.17)

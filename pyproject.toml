@@ -1,0 +1,32 @@
+[project]
+name = "decisionmodel"
+version = "0.1.0"
+description = "A local decision model: unstructured state in, typed probabilistic decisions out."
+readme = "README.md"
+authors = [
+    { name = "Preston Rozwood", email = "279pdbz199@gmail.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=5.0.1",
+    "numpy>=2.5.3",
+    "scikit-learn>=1.9.1",
+    "torch>=2.14.0",
+    "transformers>=5.17.0",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.14,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+# uv-managed CPython ships the C headers that Triton needs to build its CUDA shim;
+# many system Pythons do not.
+python-preference = "only-managed"
+
+[dependency-groups]
+dev = [
+    "matplotlib>=3.11.2",
+    "pillow>=12.3.0",
+    "pytest>=9.1.1",
+]

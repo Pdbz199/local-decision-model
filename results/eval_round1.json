@@ -1,0 +1,58 @@
+{
+  "imdb (bool)": {
+    "n": 2000,
+    "accuracy": 0.9365,
+    "ece": 0.0245,
+    "mean_confidence": 0.9597,
+    "items_per_sec": 326.7,
+    "options": 2
+  },
+  "ag_news (enum, 4)": {
+    "n": 2000,
+    "accuracy": 0.7525,
+    "ece": 0.0713,
+    "mean_confidence": 0.8197,
+    "items_per_sec": 1160.4,
+    "options": 4
+  },
+  "banking77 (enum, 77)": {
+    "n": 3076,
+    "accuracy": 0.6128,
+    "ece": 0.1968,
+    "mean_confidence": 0.8089,
+    "items_per_sec": 386.5,
+    "options": 77
+  },
+  "sms_spam (bool)": {
+    "n": 2000,
+    "accuracy": 0.719,
+    "ece": 0.0997,
+    "mean_confidence": 0.817,
+    "items_per_sec": 1839.1,
+    "options": 2
+  },
+  "prompt_injections (bool)": {
+    "n": 662,
+    "accuracy": 0.6631,
+    "ece": 0.3081,
+    "mean_confidence": 0.967,
+    "items_per_sec": 812.1,
+    "options": 2
+  },
+  "fin_news_sentiment (enum, 3)": {
+    "n": 2388,
+    "accuracy": 0.6675,
+    "ece": 0.0731,
+    "mean_confidence": 0.6069,
+    "items_per_sec": 1575.5,
+    "options": 3
+  },
+  "squad_v2 dev (extract)": {
+    "n": 2000,
+    "exact_match": 0.8305,
+    "f1": 0.8578,
+    "answerable_accuracy": 0.885,
+    "ece": 0.1035,
+    "items_per_sec": 78.1
+  }
+}

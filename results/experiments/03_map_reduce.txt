@@ -1,0 +1,30 @@
+
+==============================================================================
+Experiment 3: map-reduce over 7,600 news articles and 2,000 long reviews
+==============================================================================
+
+  MAP    7600 articles x 2 fields = 15200 decisions in 10.1 s
+         750 articles/s, 1,500 decisions/s, 79,536 state tokens/s
+  REDUCE topic counts (true / hard votes / expected counts from probabilities):
+         world                     1900 /  2107 /  2111.8
+         sports                    1900 /  2015 /  2040.4
+         business                  1900 /  2673 /  2509.5
+         science and technology    1900 /   805 /   938.4
+         mean P(discusses markets): business articles 0.34, sports articles 0.02
+  zero-shot topic accuracy: 0.736 (chance is 0.25). Most misses are tech-company business stories, which this
+  dataset files under Sci/Tech and the model files under business: a labeling convention it was never shown.
+
+  Long inputs: 2,000 IMDB reviews (mean 287 tokens) in 6.1 s = 329 reviews/s, 94,494 tokens/s, accuracy 0.944
+  REDUCE positive reviews: true 985, expected count from probabilities 948.4
+  A billion input tokens would take about 2.9 GPU hours on this one consumer card.
+
+Checks:
+  [PASS] zero-shot news topic accuracy above 0.70 (chance 0.25) (0.736)
+  [PASS] zero-shot review sentiment accuracy above 0.90 (0.944)
+  [PASS] sports count from probabilities within 10% of truth
+  [PASS] expected number of positive reviews within 5% of truth (948 vs 985)
+  [PASS] market predicate separates business from sports
+  [PASS] throughput above 500 decisions per second
+  [PASS] throughput above 50,000 tokens per second on long inputs (94,494)
+
+All checks passed.

@@ -1,0 +1,33 @@
+
+==============================================================================
+Experiment 5: calibration and type safety
+==============================================================================
+
+[A] Calibration on held-out tasks (binary tasks, so confidence is always >= 0.5)
+    confidence bin      n   mean confidence   actual accuracy
+    [0.50, 0.60)     385             0.550             0.613
+    [0.60, 0.70)     432             0.650             0.727
+    [0.70, 0.80)     479             0.751             0.800
+    [0.80, 0.90)     554             0.850             0.744
+    [0.90, 0.95)     343             0.926             0.778
+    [0.95, 1.00)    1629             0.988             0.942
+    overall accuracy 0.823, mean confidence 0.850, expected calibration error 0.069
+
+[B] Type-safety fuzzing
+    209 hostile or garbage inputs x 6 typed fields: 0 type violations
+
+[C] Latency as the state grows
+      128 token state, 2 fields: p50 12.4 ms, p95 24.2 ms, max 26.8 ms
+      512 token state, 2 fields: p50 14.4 ms, p95 21.3 ms, max 25.1 ms
+     2048 token state, 2 fields: p50 43.5 ms, p95 45.6 ms, max 46.3 ms
+     8000 token state, 2 fields: p50 351.1 ms, p95 352.8 ms, max 353.9 ms
+
+Checks:
+  [PASS] expected calibration error under 0.08 on held-out tasks (0.069)
+  [PASS] confidence is informative: accuracy at >=0.9 confidence beats accuracy below 0.7 (0.913 vs 0.673)
+  [PASS] zero type violations under fuzzing
+  [PASS] invalid schemas are rejected before inference
+  [PASS] 512-token state answers within 70 ms at p95
+  [PASS] 8000-token state answers within 500 ms at p95 (slow end of Jev's range)
+
+All checks passed.

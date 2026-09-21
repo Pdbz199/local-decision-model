@@ -1,0 +1,38 @@
+
+==============================================================================
+Experiment 2: 77-way intent routing, zero-shot
+==============================================================================
+
+  'How do I locate my card?'
+    gold: card arrival
+    top3: lost or stolen card (0.40), visa or mastercard (0.19), activate my card (0.06)
+
+  'I still have not received my new card, I ordered over a week ago.'
+    gold: card arrival
+    top3: get physical card (0.72), order physical card (0.08), card arrival (0.08)
+
+  'I ordered a card but it has not arrived. Help please!'
+    gold: card arrival
+    top3: card arrival (0.56), order physical card (0.22), get physical card (0.09)
+
+  3076 messages, 77 options, chance accuracy 0.013
+  top-1 accuracy 0.630   top-3 accuracy 0.802
+
+  Selective automation (act only when confidence >= threshold, escalate otherwise):
+    threshold  automated  accuracy on automated
+          0.0    100.0%  0.630
+          0.5     78.2%  0.722
+          0.7     65.4%  0.776
+          0.9     48.4%  0.836
+
+Checks:
+  [PASS] zero-shot top-1 accuracy at least 30x chance (0.630)
+  [PASS] accuracy rises with the confidence threshold
+  [PASS] every prediction is one of the 77 declared options
+
+  latency, one message against 77 options: p50 9.6 ms, p95 14.7 ms, max 21.7 ms
+  [PASS] 77-option decision p95 under 70 ms
+  latency, one message against 255 options (Jev's stated maximum): p50 16.5 ms, p95 20.8 ms, max 24.0 ms
+  [PASS] 255-option decision p95 under 150 ms, in one pass with no second stage
+
+All checks passed.
