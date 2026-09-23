@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+* `scripts/eval_jevbench.py` runs the model on the 231 public items of [JevBench](https://github.com/fstandhartinger/jevbench),
+  a third-party benchmark for Jev-class decision models, pinned by commit and file hash. Results are in
+  `results/eval_jevbench.json` and in a README table next to the numbers JevBench published for Jev and for two
+  other ModernBERT-based open models. Self-measured on the public items only, not an official JevBench score.
 * Experiment 6: the model plays Snake zero-shot by reading one English sentence per candidate move
   (`experiments/06_snake.py`, with `--watch` for a live terminal game and `--record` for the README GIF).
   Demo idea inspired by [laya-mlx](https://github.com/mizorewww/laya-mlx).

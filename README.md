@@ -291,6 +291,36 @@ The idea for this demo came from the Snake demo in [laya-mlx](https://github.com
 where a small local model plays Snake on Apple silicon. Ours is an independent implementation with a different approach
 (a text-reading classifier instead of a trained policy) and shares no code or assets with it.
 
+### On JevBench, a third-party benchmark for Jev-class models
+
+[JevBench](https://github.com/fstandhartinger/jevbench) is an independent, MIT-licensed benchmark for decision models,
+run by [Benchmark Heaven](https://benchmarkheaven.com/jev-models). It measured Jev itself and about seventy other
+systems: open reproductions, rerankers, zero-shot classifiers and general LLMs asked the same questions. 231 of its
+decisions are public (48 easy, 72 standard, 111 hard); its judge tier and 308 sealed decisions are private.
+`scripts/eval_jevbench.py` downloads the public files from a pinned commit, checks their
+hashes, and runs the model on them. Each JevBench question comes with per-option criteria, and the script runs two
+mechanical mappings: **plain** passes the question and labels as written, **with criteria** appends the criteria
+to the option texts. Nothing was tuned on these items and they were never used for training.
+
+| Tier | Chance | Ours, plain | Ours, with criteria | Jev 1.13.0 | Laya (ModernBERT-large, 421M) | openJev Verdict 1.4 (ModernBERT-base, 151M) |
+| --- | --- | --- | --- | --- | --- | --- |
+| easy (48) | 28% | 97.9% | 83.3% | 100% | 94.4% | 86.1% |
+| standard (72) | 31% | 52.8% | 63.9% | 99.0% | 72.9% | 67.7% |
+| hard (111) | 34% | 33.3% | 36.9% | 74.1% | 34.1% | 37.7% |
+| ECE, all public | | 0.151 | 0.089 | | | |
+
+Our two columns are self-measured on the public items (`results/eval_jevbench.json`), so they are **not** a JevBench
+Score or rank and are not directly comparable with the official rows, which also include the private items and
+were run on the benchmark's own hardware. The other three columns are the public-tier accuracies that JevBench
+published for those systems (v1.4 results, 23 September 2026; the hard column there covers all 220 hard items).
+Median latency in this run was 12 ms per decision on the RTX 5070 Ti.
+
+How to read it: on clear-cut decisions the model is close to Jev. On the standard tier, which asks for policy
+checks, ordinal ratings and adequacy judgments, it lands in the same band as the other small open encoders and far
+behind Jev. On the hard tier (long policies, multi-hop lookups, traps, and answer judging) every small encoder on
+the board, ours included, is at chance; only Jev and multi-billion-parameter generative reproductions get above it.
+The gap between the two mappings is the prompt sensitivity noted under [Limitations](#limitations-honestly).
+
 ### How this compares with Jev
 
 | | Jev (as described) | local-decision-model (measured) |
@@ -301,7 +331,7 @@ where a small local model plays Snake on Apple silicon. Ours is an independent i
 | Max options | 255, with a two-stage process for large sets | 255 in a single pass |
 | Text generation | none | none |
 | Calibration | RL for Calibrated Decisions (unpublished) | log loss training plus temperature fit on unseen tasks |
-| Intelligence | claimed comparable to frontier LLMs on System One tasks | a 150M encoder: good on clear-cut judgments, weak on subtle or multi-step ones |
+| Intelligence | claimed comparable to frontier LLMs on System One tasks | a 150M encoder: good on clear-cut judgments, weak on subtle or multi-step ones (see the JevBench table above) |
 | Architecture, data, size | undisclosed | ModernBERT-base + 2 heads, about 1M public examples, 150M parameters |
 
 The last two rows are the important ones. We matched the programming model and the speed. We did not, and with a
@@ -356,6 +386,7 @@ scripts/make_stage2.py     builds the small stage 2 refresh set
 scripts/average_checkpoints.py  averages checkpoints from the same lineage
 scripts/evaluate.py        zero-shot evaluation on held-out datasets
 scripts/eval_multilabel.py held-out multi-label evaluation
+scripts/eval_jevbench.py  runs the public JevBench items (a third-party benchmark) and saves results/eval_jevbench.json
 scripts/collect_visual_data.py, make_visuals.py   real model outputs -> assets/data.json, assets/snake.json -> images and GIFs
 scripts/reproduce.sh       rebuilds everything end to end
 scripts/publish_to_hub.py  uploads the checkpoint and a model card to the HuggingFace Hub

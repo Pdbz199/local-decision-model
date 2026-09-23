@@ -1,0 +1,286 @@
+{
+  "benchmark": "JevBench public items (easy, standard, hard); the judge tier and sealed items are private",
+  "source": "https://github.com/fstandhartinger/jevbench at 2fa63fa3226cb369795525ed011800f57dcbd894",
+  "files": {
+    "easy": {
+      "file": "easy.jsonl",
+      "sha256": "231df3c2c8e88a1a8c137ebe85de96ba70fabd330849098ac7b3c52c70b7172b"
+    },
+    "standard": {
+      "file": "original.jsonl",
+      "sha256": "5c2414edb3006b8bfcb70fda433f0f9ca015759433849f8d3104328a1f7c4180"
+    },
+    "hard": {
+      "file": "hard.jsonl",
+      "sha256": "89e9e6becb33ed88c1de7d42dcc87531b2fb64cfaef4e1986faf7c37b3f80ebb"
+    }
+  },
+  "note": "Self-measured on the public items only. Not an official JevBench Score or rank.",
+  "measured_utc": "2026-09-23T23:31:52+00:00",
+  "device": "cuda",
+  "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+  "variants": {
+    "plain": {
+      "easy": {
+        "n": 48,
+        "accuracy": 0.9791666666666666,
+        "chance": 0.284375,
+        "ece": 0.06417016001068987,
+        "mean_confidence": 0.9408779709386484,
+        "by_family": {
+          "extraction": {
+            "correct": 12,
+            "n": 12
+          },
+          "fact": {
+            "correct": 12,
+            "n": 12
+          },
+          "intent": {
+            "correct": 11,
+            "n": 12
+          },
+          "tool_selection": {
+            "correct": 12,
+            "n": 12
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 10.826069999893662,
+          "p95": 20.080341400171164
+        }
+      },
+      "standard": {
+        "n": 72,
+        "accuracy": 0.5277777777777778,
+        "chance": 0.3111111111111111,
+        "ece": 0.12087543681263924,
+        "mean_confidence": 0.6027474912504355,
+        "by_family": {
+          "adequacy": {
+            "correct": 5,
+            "n": 12
+          },
+          "extraction": {
+            "correct": 8,
+            "n": 12
+          },
+          "intent": {
+            "correct": 8,
+            "n": 12
+          },
+          "ordinal": {
+            "correct": 3,
+            "n": 12
+          },
+          "policy": {
+            "correct": 6,
+            "n": 12
+          },
+          "routing": {
+            "correct": 8,
+            "n": 12
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 10.579771000266192,
+          "p95": 21.778866600925546
+        }
+      },
+      "hard": {
+        "n": 111,
+        "accuracy": 0.3333333333333333,
+        "chance": 0.3361861861861862,
+        "ece": 0.2673471775409338,
+        "mean_confidence": 0.5727208403048215,
+        "by_family": {
+          "adversarial": {
+            "correct": 4,
+            "n": 6
+          },
+          "ambiguous": {
+            "correct": 2,
+            "n": 7
+          },
+          "judge_hard": {
+            "correct": 6,
+            "n": 17
+          },
+          "long_policy": {
+            "correct": 7,
+            "n": 19
+          },
+          "multi_hop": {
+            "correct": 2,
+            "n": 18
+          },
+          "probability": {
+            "correct": 4,
+            "n": 10
+          },
+          "routing_hard": {
+            "correct": 4,
+            "n": 5
+          },
+          "temporal_numeric": {
+            "correct": 5,
+            "n": 15
+          },
+          "tradeoff": {
+            "correct": 2,
+            "n": 6
+          },
+          "trap": {
+            "correct": 1,
+            "n": 8
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 13.284797001688275,
+          "p95": 39.42226400067739
+        }
+      },
+      "all_public": {
+        "n": 231,
+        "accuracy": 0.5281385281385281,
+        "ece": 0.1505431881863866
+      },
+      "serial_latency_ms": {
+        "p50": 12.052513000526233,
+        "p95": 33.48580049987504,
+        "max": 55.976749001274584
+      }
+    },
+    "criteria": {
+      "easy": {
+        "n": 48,
+        "accuracy": 0.8333333333333334,
+        "chance": 0.284375,
+        "ece": 0.08309304962555566,
+        "mean_confidence": 0.8539041578769684,
+        "by_family": {
+          "extraction": {
+            "correct": 12,
+            "n": 12
+          },
+          "fact": {
+            "correct": 4,
+            "n": 12
+          },
+          "intent": {
+            "correct": 12,
+            "n": 12
+          },
+          "tool_selection": {
+            "correct": 12,
+            "n": 12
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 10.799679499541526,
+          "p95": 15.52162185016641
+        }
+      },
+      "standard": {
+        "n": 72,
+        "accuracy": 0.6388888888888888,
+        "chance": 0.3111111111111111,
+        "ece": 0.11234331255157788,
+        "mean_confidence": 0.6014794694880644,
+        "by_family": {
+          "adequacy": {
+            "correct": 5,
+            "n": 12
+          },
+          "extraction": {
+            "correct": 8,
+            "n": 12
+          },
+          "intent": {
+            "correct": 8,
+            "n": 12
+          },
+          "ordinal": {
+            "correct": 9,
+            "n": 12
+          },
+          "policy": {
+            "correct": 6,
+            "n": 12
+          },
+          "routing": {
+            "correct": 10,
+            "n": 12
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 10.75473599939869,
+          "p95": 18.618627400974223
+        }
+      },
+      "hard": {
+        "n": 111,
+        "accuracy": 0.36936936936936937,
+        "chance": 0.3361861861861862,
+        "ece": 0.1548124413501035,
+        "mean_confidence": 0.5050232897739153,
+        "by_family": {
+          "adversarial": {
+            "correct": 5,
+            "n": 6
+          },
+          "ambiguous": {
+            "correct": 1,
+            "n": 7
+          },
+          "judge_hard": {
+            "correct": 9,
+            "n": 17
+          },
+          "long_policy": {
+            "correct": 5,
+            "n": 19
+          },
+          "multi_hop": {
+            "correct": 5,
+            "n": 18
+          },
+          "probability": {
+            "correct": 5,
+            "n": 10
+          },
+          "routing_hard": {
+            "correct": 1,
+            "n": 5
+          },
+          "temporal_numeric": {
+            "correct": 4,
+            "n": 15
+          },
+          "tradeoff": {
+            "correct": 2,
+            "n": 6
+          },
+          "trap": {
+            "correct": 4,
+            "n": 8
+          }
+        },
+        "serial_latency_ms": {
+          "p50": 14.962675000788295,
+          "p95": 39.75591299968073
+        }
+      },
+      "all_public": {
+        "n": 231,
+        "accuracy": 0.5497835497835498,
+        "ece": 0.08915075511385352
+      },
+      "serial_latency_ms": {
+        "p50": 12.26260099974752,
+        "p95": 33.97751950069505,
+        "max": 52.437387999816565
+      }
+    }
+  }
+}
